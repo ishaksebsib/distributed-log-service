@@ -8,14 +8,16 @@ import (
 )
 
 var (
-	offWidth uint64 = 4
-	posWidth uint64 = 8
-	entWidth        = offWidth + posWidth
+	offWidth uint64 = 4 // 4 bites for offset
+	posWidth uint64 = 8 // 8 bites for position
+	entWidth        = offWidth + posWidth // total width of an entry
 )
 
+// index is a memory mapped file that contains the offsets and positions of the store
+// it acts like a table of contents for the store enables fast random access
 type index struct {
 	file *os.File
-	mmap gommap.MMap
+	mmap gommap.MMap // memory mapped representation of the file
 	size uint64
 }
 
@@ -29,6 +31,7 @@ func newIndex(f *os.File, c Config) (*index, error) {
 		return nil, err
 	}
 
+	// change the size of the file to the max index size (c.Segment.MaxIndexBytes)
 	idx.size = uint64(fi.Size())
 	if err = os.Truncate(
 		f.Name(),
@@ -37,6 +40,7 @@ func newIndex(f *os.File, c Config) (*index, error) {
 		return nil, err
 	}
 
+	// map the file to memory
 	if idx.mmap, err = gommap.Map(
 		idx.file.Fd(),
 		gommap.PROT_READ|gommap.PROT_WRITE,
@@ -62,6 +66,7 @@ func (i *index) Close() error {
 	return i.file.Close()
 }
 
+// read the file at the given index/position
 func (i *index) Read(in int64) (out uint32, pos uint64, err error) {
 	if i.size == 0 {
 		return 0, 0, io.EOF
