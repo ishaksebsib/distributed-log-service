@@ -90,7 +90,7 @@ func TestStoreClose(t *testing.T) {
 	_, afterSize, eerr := openFile(f.Name())
 	require.NoError(t, eerr)
 
-	require.True(t, beforeSize > afterSize)
+	require.True(t, afterSize > beforeSize)
 }
 
 func openFile(name string) (file *os.File, size int64, err error) {
