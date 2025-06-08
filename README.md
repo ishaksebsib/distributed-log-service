@@ -12,7 +12,7 @@
 
 **Part II – Network**
 
-- [ ] 4. Serve Requests with gRPC  
+- [x] 4. Serve Requests with gRPC  
      ↳ Expose the log over the network using gRPC and define service interfaces
 - [ ] 5. Secure Your Services  
      ↳ Add TLS encryption and client authentication to secure communication
