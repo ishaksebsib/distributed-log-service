@@ -8,6 +8,7 @@ import (
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/status"
 
 	api "github.com/ishaksebsib/distributed-log-service/api/v1"
 	"github.com/ishaksebsib/distributed-log-service/internal/log"
@@ -21,6 +22,7 @@ func TestServer(t *testing.T) {
 		config *Config,
 	){
 		"produce/consume a message to/from the log using grpc succeeeds": testProduceConsume,
+		"consume a message that is out of range returns an error":        testConsumePastBoundary,
 	} {
 		t.Run(scenario, func(t *testing.T) {
 			client, config, teardown := setupTest(t, nil)
@@ -97,4 +99,34 @@ func testProduceConsume(t *testing.T, client api.LogClient, config *Config) {
 	require.NoError(t, err)
 	require.Equal(t, tempLog.Value, consume.Record.Value)
 	require.Equal(t, tempLog.Offset, consume.Record.Offset)
+}
+
+func testConsumePastBoundary(
+	t *testing.T,
+	client api.LogClient,
+	config *Config,
+) {
+	ctx := context.Background()
+
+	tempLog := &api.Record{
+		Value: []byte("hello world"),
+	}
+
+	produce, err := client.Produce(ctx, &api.ProduceRequest{
+		Record: tempLog,
+	})
+	require.NoError(t, err)
+
+	consume, err := client.Consume(ctx, &api.ConsumeRequest{
+		Offset: produce.Offset + 1,
+	})
+	if consume != nil {
+		t.Fatal("consume not nil")
+	}
+
+	got := status.Code(err)
+	want := status.Code(api.ErrOffsetOutOfRange{}.GRPCStatus().Err())
+	if got != want {
+		t.Fatalf("got err: %v, want: %v", got, want)
+	}
 }
