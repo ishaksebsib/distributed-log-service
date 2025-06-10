@@ -1,0 +1,48 @@
+name: Go CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  CONFIG_PATH: ${{ github.workspace }}/.proglog/
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: '1.24'
+
+    - name: Install cfssl
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y golang-cfssl
+
+    - name: Install protoc and Go plugins
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y protobuf-compiler
+        go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
+        go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
+        export PATH="$PATH:$(go env GOPATH)/bin"
+
+    - name: Create config path
+      run: make init
+
+    - name: Generate certs
+      run: make gencert
+
+    - name: Compile protobufs
+      run: make compile
+
+    - name: Run tests
+      run: make test
