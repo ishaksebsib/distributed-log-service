@@ -1,0 +1,19 @@
+{
+	"CN": "client",
+	"hosts": [
+		""
+	],
+	"key": {
+		"algo": "rsa",
+		"size": 2048
+	},
+	"names": [
+		{
+			"C": "ET",
+			"L": "Addis Ababa",
+			"ST": "Addis Ababa",
+			"O": "My Awesome Company",
+			"OU": "Distributed Services"
+		}
+	]
+}
