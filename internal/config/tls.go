@@ -12,7 +12,7 @@ type TLSConfig struct {
 	KeyFile       string
 	CAFile        string
 	ServerAddress string
-	Server        bool
+	IsServer        bool
 }
 
 func SetupTLSConfig(cfg TLSConfig) (*tls.Config, error) {
@@ -45,7 +45,7 @@ func SetupTLSConfig(cfg TLSConfig) (*tls.Config, error) {
 			)
 		}
 
-		if cfg.Server {
+		if cfg.IsServer {
 			tlsConfig.ClientCAs = ca
 			tlsConfig.ClientAuth = tls.RequireAndVerifyClientCert
 		} else {
