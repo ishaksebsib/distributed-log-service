@@ -8,7 +8,6 @@ import (
 )
 
 func New(model, policy string) *Authorizer {
-	println(model)
 	enforcer := casbin.NewEnforcer(model, policy)
 
 	return &Authorizer{
