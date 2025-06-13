@@ -16,7 +16,7 @@
      ↳ Expose the log over the network using gRPC and define service interfaces
 - [x] 5. Secure Your Services  
      ↳ Add TLS encryption and client authentication to secure communication
-- [ ] 6. Observe Your Systems  
+- [x] 6. Observe Your Systems  
      ↳ Integrate metrics, logging, and tracing to make the system observable
 
 ---
